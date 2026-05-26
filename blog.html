@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Pokémon Fan Log</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:    #E63946;
+      --yellow: #FFD166;
+      --blue:   #118AB2;
+      --dark:   #1a1a2e;
+      --cream:  #FFF8F0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background-color: var(--cream);
+      color: var(--dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    /* HEADER */
+    header {
+      position: relative;
+      background: var(--red);
+      overflow: hidden;
+    }
+    header::after {
+      content: "";
+      position: absolute; right: -80px; top: 50%; transform: translateY(-50%);
+      width: 220px; height: 220px; border-radius: 50%;
+      background: conic-gradient(#f0f0f0 0deg 180deg, #222 180deg 360deg);
+      opacity: 0.12; border: 12px solid rgba(255,255,255,0.15);
+    }
+    .header-inner {
+      max-width: 640px; margin: auto;
+      padding: 28px 20px 18px; position: relative; z-index: 2;
+    }
+    header h1 {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: 38px; letter-spacing: 3px;
+      color: #fff; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); line-height: 1;
+    }
+    header h1 span { color: var(--yellow); }
+
+    nav { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+    nav a {
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      padding: 5px 14px;
+      border: 1.5px solid rgba(255,255,255,0.3); border-radius: 999px;
+      transition: all 0.2s;
+    }
+    nav a:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.7); }
+    nav a.active { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.8); }
+
+    .redline {
+      height: 5px;
+      background: linear-gradient(90deg, var(--red), var(--yellow), var(--blue));
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 640px; margin: auto;
+      padding: 32px 16px 64px;
+      position: relative; z-index: 1;
+    }
+
+    /* POST FORM */
+    .post-form {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      border: 2px solid #eee;
+      box-shadow: 3px 3px 0 #eee;
+      margin-bottom: 24px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+      border: 2px solid var(--yellow);
+    }
+    .form-body { flex: 1; }
+    .form-body textarea {
+      width: 100%; border: none; outline: none; resize: none;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 15px; line-height: 1.7;
+      color: var(--dark); background: transparent;
+    }
+    .form-body textarea::placeholder { color: #bbb; }
+    .form-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .char-count { font-size: 12px; color: #bbb; }
+    .post-btn {
+      background: var(--red); color: #fff;
+      border: none; border-radius: 999px;
+      padding: 7px 20px; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      font-family: "Dela Gothic One", sans-serif; letter-spacing: 1px;
+    }
+    .post-btn:hover { background: #c02030; transform: translateY(-1px); }
+
+    /* SECTION HEADER */
+    .section-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    }
+    .section-header h2 {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: 16px; letter-spacing: 1px;
+    }
+    .section-tag {
+      background: var(--red); color: #fff;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      padding: 3px 10px; border-radius: 999px;
+    }
+
+    /* TWEET CARD */
+    .tweet {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      border: 2px solid #eee;
+      box-shadow: 2px 2px 0 #e0e0e0;
+      margin-bottom: 12px;
+      display: flex; gap: 12px;
+      transition: all 0.18s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .tweet:hover {
+      border-color: var(--red);
+      box-shadow: 4px 4px 0 var(--red);
+      transform: translate(-2px, -2px);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .tweet:nth-child(1) { animation-delay: 0.05s; }
+    .tweet:nth-child(2) { animation-delay: 0.10s; }
+    .tweet:nth-child(3) { animation-delay: 0.15s; }
+    .tweet:nth-child(4) { animation-delay: 0.20s; }
+    .tweet:nth-child(5) { animation-delay: 0.25s; }
+    .tweet:nth-child(6) { animation-delay: 0.30s; }
+
+    .tweet-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+      border: 2px solid var(--yellow);
+    }
+    .tweet-body { flex: 1; min-width: 0; }
+
+    .tweet-meta {
+      display: flex; align-items: baseline; gap: 8px;
+      margin-bottom: 6px; flex-wrap: wrap;
+    }
+    .tweet-name  { font-weight: 700; font-size: 14px; color: var(--dark); }
+    .tweet-handle { font-size: 12px; color: #aaa; }
+    .tweet-date  { font-size: 11px; color: #bbb; margin-left: auto; }
+
+    .tweet-text {
+      font-size: 14px; line-height: 1.75; color: #333;
+      word-break: break-word;
+    }
+
+    .tweet-tags { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 11px; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px;
+    }
+    .tag-blue   { background: #E8F4FD; color: var(--blue); }
+    .tag-red    { background: #FEE8E8; color: var(--red); }
+    .tag-yellow { background: #FFF8E1; color: #B8860B; }
+
+    .tweet-actions { display: flex; gap: 16px; margin-top: 10px; }
+    .action-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 12px; color: #bbb;
+      display: flex; align-items: center; gap: 4px;
+      padding: 0; transition: color 0.2s;
+      font-family: "Noto Sans JP", sans-serif;
+    }
+    .action-btn:hover { color: var(--red); }
+    .action-btn.liked { color: var(--red); }
+    .action-btn span { font-size: 13px; }
+
+    /* FOOTER */
+    footer {
+      text-align: center; padding: 30px 20px;
+      border-top: 2px solid #eee;
+      font-size: 12px; color: #aaa;
+      position: relative; z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1><span>Pokémon</span> Fan Log</h1>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="blog.html" class="active">BLOG</a>
+      <a href="gallery.html">GALLERY</a>
+      <a href="about.html">ABOUT</a>
+    </nav>
+  </div>
+</header>
+<div class="redline"></div>
+
+<div class="container">
+
+  <div class="post-form">
+    <div class="avatar">🎮</div>
+    <div class="form-body">
+      <textarea rows="3" placeholder="ポケモンへの気持ち、つぶやいて…" id="textarea" maxlength="140" oninput="updateCount()"></textarea>
+      <div class="form-footer">
+        <span class="char-count"><span id="count">0</span> / 140</span>
+        <button class="post-btn" onclick="postTweet()">つぶやく</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2>タイムライン</h2>
+    <span class="section-tag">NEW</span>
+  </div>
+
+  <div id="timeline">
+
+    <div class="tweet">
+      <div class="tweet-avatar">🌿</div>
+      <div class="tweet-body">
+        <div class="tweet-meta">
+          <span class="tweet-name">ポケモン Fan Log</span>
+          <span class="tweet-handle">@pokemon_fanlog</span>
+          <span class="tweet-date">5月22日</span>
+        </div>
+        <div class="tweet-text">ミュウツーの逆襲、何回観ても泣く。「なぜ生まれてきたのか」って問い、子どもの頃は分からなかったけど今になってじんわり刺さる。</div>
+        <div class="tweet-tags">
+          <span class="tag tag-red">映画</span>
+          <span class="tag tag-blue">ミュウツー</span>
+        </div>
+        <div class="tweet-actions">
+          <button class="action-btn" onclick="toggleLike(this)"><span>♡</span> <span class="like-count">12</span></button>
+          <button class="action-btn"><span>🔁</span> 3</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tweet">
+      <div class="tweet-avatar">⚡</div>
+      <div class="tweet-body">
+        <div class="tweet-meta">
+          <span class="tweet-name">ポケモン Fan Log</span>
+          <span class="tweet-handle">@pokemon_fanlog</span>
+          <span class="tweet-date">5月19日</span>
+        </div>
+        <div class="tweet-text">フシギダネが進化しなかったの、ずっと正解だと思ってる。強くなることだけがゴールじゃないっていうか。なんか分からないけどすごく好き。</div>
+        <div class="tweet-tags">
+          <span class="tag tag-yellow">アニメ</span>
+          <span class="tag tag-blue">フシギダネ</span>
+        </div>
+        <div class="tweet-actions">
+          <button class="action-btn" onclick="toggleLike(this)"><span>♡</span> <span class="like-count">28</span></button>
+          <button class="action-btn"><span>🔁</span> 7</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tweet">
+      <div class="tweet-avatar">🌙</div>
+      <div class="tweet-body">
+        <div class="tweet-meta">
+          <span class="tweet-name">ポケモン Fan Log</span>
+          <span class="tweet-handle">@pokemon_fanlog</span>
+          <span class="tweet-date">5月17日</span>
+        </div>
+        <div class="tweet-text">ゲンガーって怖いのに全然暗くないんだよな。「怖い」と「好き」が同時に来るポケモン、他にいなくない？ずっと一番好きかもしれない。</div>
+        <div class="tweet-tags">
+          <span class="tag tag-blue">ゲンガー</span>
+          <span class="tag tag-red">ゴースト</span>
+        </div>
+        <div class="tweet-actions">
+          <button class="action-btn liked" onclick="toggleLike(this)"><span>♥</span> <span class="like-count">41</span></button>
+          <button class="action-btn"><span>🔁</span> 11</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tweet">
+      <div class="tweet-avatar">🎮</div>
+      <div class="tweet-body">
+        <div class="tweet-meta">
+          <span class="tweet-name">ポケモン Fan Log</span>
+          <span class="tweet-handle">@pokemon_fanlog</span>
+          <span class="tweet-date">5月14日</span>
+        </div>
+        <div class="tweet-text">ポケモンSVのラスト、ゲームでこんなに泣くと思わなかった……。ペパーのエピソードも良かったけど、やっぱりネモのルートが一番刺さった。</div>
+        <div class="tweet-tags">
+          <span class="tag tag-yellow">SV</span>
+          <span class="tag tag-blue">考察</span>
+        </div>
+        <div class="tweet-actions">
+          <button class="action-btn" onclick="toggleLike(this)"><span>♡</span> <span class="like-count">19</span></button>
+          <button class="action-btn"><span>🔁</span> 5</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tweet">
+      <div class="tweet-avatar">🌊</div>
+      <div class="tweet-body">
+        <div class="tweet-meta">
+          <span class="tweet-name">ポケモン Fan Log</span>
+          <span class="tweet-handle">@pokemon_fanlog</span>
+          <span class="tweet-date">5月10日</span>
+        </div>
+        <div class="tweet-text">XYのゲッコウガとの絆の描き方、本当に異常。サトシが倒れるとゲッコウガも倒れるやつ、何なんあれ。あの作画クオリティ今でもおかしい。</div>
+        <div class="tweet-tags">
+          <span class="tag tag-yellow">アニメ</span>
+          <span class="tag tag-blue">ゲッコウガ</span>
+        </div>
+        <div class="tweet-actions">
+          <button class="action-btn" onclick="toggleLike(this)"><span>♡</span> <span class="like-count">33</span></button>
+          <button class="action-btn"><span>🔁</span> 9</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tweet">
+      <div class="tweet-avatar">✨</div>
+      <div class="tweet-body">
+        <div class="tweet-meta">
+          <span class="tweet-name">ポケモン Fan Log</span>
+          <span class="tweet-handle">@pokemon_fanlog</span>
+          <span class="tweet-date">4月28日</span>
+        </div>
+        <div class="tweet-text">ポケモンってずっと「人間とポケモンが一緒に生きていく」話なんだよね。支配でも従属でもなく対等に近い何か。子どもの頃から無意識に教わってたのかも。</div>
+        <div class="tweet-tags">
+          <span class="tag tag-red">考察</span>
+        </div>
+        <div class="tweet-actions">
+          <button class="action-btn" onclick="toggleLike(this)"><span>♡</span> <span class="like-count">55</span></button>
+          <button class="action-btn"><span>🔁</span> 14</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>⚪ © Pokémon Fan Log — 好きを置いておく場所</p>
+</footer>
+
+<script>
+  function updateCount() {
+    const ta = document.getElementById('textarea');
+    document.getElementById('count').textContent = ta.value.length;
+  }
+
+  function postTweet() {
+    const ta = document.getElementById('textarea');
+    const text = ta.value.trim();
+    if (!text) return;
+
+    const timeline = document.getElementById('timeline');
+    const now = new Date();
+    const dateStr = (now.getMonth()+1) + '月' + now.getDate() + '日';
+
+    const emojis = ['🎮','⚡','🌿','🌊','🌙','✨','🔥','🍃'];
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+    const tweet = document.createElement('div');
+    tweet.className = 'tweet';
+    tweet.style.animationDelay = '0s';
+    tweet.innerHTML = `
+      <div class="tweet-avatar">${emoji}</div>
+      <div class="tweet-body">
+        <div class="tweet-meta">
+          <span class="tweet-name">ポケモン Fan Log</span>
+          <span class="tweet-handle">@pokemon_fanlog</span>
+          <span class="tweet-date">${dateStr}</span>
+        </div>
+        <div class="tweet-text">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <div class="tweet-actions">
+          <button class="action-btn" onclick="toggleLike(this)"><span>♡</span> <span class="like-count">0</span></button>
+          <button class="action-btn"><span>🔁</span> 0</button>
+        </div>
+      </div>
+    `;
+
+    timeline.insertBefore(tweet, timeline.firstChild);
+    ta.value = '';
+    document.getElementById('count').textContent = '0';
+  }
+
+  function toggleLike(btn) {
+    const countEl = btn.querySelector('.like-count');
+    const iconEl  = btn.querySelector('span');
+    let count = parseInt(countEl.textContent);
+    if (btn.classList.contains('liked')) {
+      btn.classList.remove('liked');
+      iconEl.textContent = '♡';
+      countEl.textContent = count - 1;
+    } else {
+      btn.classList.add('liked');
+      iconEl.textContent = '♥';
+      countEl.textContent = count + 1;
+    }
+  }
+</script>
+
+</body>
+</html>
