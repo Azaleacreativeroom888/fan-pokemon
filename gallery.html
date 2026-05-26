@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery — Pokémon Fan Log</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:    #E63946;
+      --yellow: #FFD166;
+      --blue:   #118AB2;
+      --dark:   #1a1a2e;
+      --cream:  #FFF8F0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background-color: var(--cream);
+      color: var(--dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    /* HEADER */
+    header {
+      position: relative;
+      background: var(--red);
+      overflow: hidden;
+    }
+    header::after {
+      content: "";
+      position: absolute; right: -80px; top: 50%; transform: translateY(-50%);
+      width: 220px; height: 220px; border-radius: 50%;
+      background: conic-gradient(#f0f0f0 0deg 180deg, #222 180deg 360deg);
+      opacity: 0.12; border: 12px solid rgba(255,255,255,0.15);
+    }
+    .header-inner {
+      max-width: 900px; margin: auto;
+      padding: 28px 20px 18px; position: relative; z-index: 2;
+    }
+    header h1 {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: 38px; letter-spacing: 3px;
+      color: #fff; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); line-height: 1;
+    }
+    header h1 span { color: var(--yellow); }
+
+    nav { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+    nav a {
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      padding: 5px 14px;
+      border: 1.5px solid rgba(255,255,255,0.3); border-radius: 999px;
+      transition: all 0.2s;
+    }
+    nav a:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.7); }
+    nav a.active { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.8); }
+
+    .redline {
+      height: 5px;
+      background: linear-gradient(90deg, var(--red), var(--yellow), var(--blue));
+    }
+
+    /* CONTAINER */
+    .container {
+      max-width: 900px; margin: auto;
+      padding: 40px 20px 64px;
+      position: relative; z-index: 1;
+    }
+
+    /* SECTION HEADER */
+    .section-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+    }
+    .section-header h2 {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: 18px; letter-spacing: 1px;
+    }
+    .section-line {
+      flex: 1; height: 2px;
+      background: linear-gradient(to right, #e0e0e0, transparent);
+      border-radius: 999px;
+    }
+
+    /* GALLERY GRID */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .gallery { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ITEM */
+    .item {
+      background: #fff;
+      border-radius: 14px;
+      border: 2px solid #eee;
+      box-shadow: 3px 3px 0 #e0e0e0;
+      overflow: hidden;
+      transition: all 0.18s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .item:hover {
+      border-color: var(--red);
+      box-shadow: 5px 5px 0 var(--red);
+      transform: translate(-3px, -3px);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .item:nth-child(1) { animation-delay: 0.05s; }
+    .item:nth-child(2) { animation-delay: 0.10s; }
+    .item:nth-child(3) { animation-delay: 0.15s; }
+    .item:nth-child(4) { animation-delay: 0.20s; }
+    .item:nth-child(5) { animation-delay: 0.25s; }
+    .item:nth-child(6) { animation-delay: 0.30s; }
+
+    /* IMAGE AREA */
+    .item-img {
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: #f5f5f5;
+      position: relative;
+    }
+    .item-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.4s ease;
+    }
+    .item:hover .item-img img {
+      transform: scale(1.04);
+    }
+
+    /* PLACEHOLDER */
+    .item-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; color: #ccc;
+    }
+    .ph-icon  { font-size: 28px; }
+    .ph-label {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: 10px; letter-spacing: 2px; color: #ddd;
+    }
+
+    /* CAPTION */
+    .caption {
+      padding: 10px 14px 12px;
+      font-size: 12px; color: #888;
+      line-height: 1.6;
+      border-top: 2px solid #f0f0f0;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center; padding: 30px 20px;
+      border-top: 2px solid #eee;
+      font-size: 12px; color: #aaa;
+      position: relative; z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1><span>Pokémon</span> Fan Log</h1>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="blog.html">BLOG</a>
+      <a href="gallery.html" class="active">GALLERY</a>
+      <a href="about.html">ABOUT</a>
+    </nav>
+  </div>
+</header>
+<div class="redline"></div>
+
+<div class="container">
+
+  <div class="section-header">
+    <h2>Illustration</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="gallery">
+
+    <!-- ▼▼▼ 画像を追加するときはここをコピーして増やす ▼▼▼ -->
+
+    <div class="item">
+      <div class="item-img">
+        <img src="img1.jpg" alt="このシーン好きすぎて描いた">
+        <!--
+          画像ファイルがまだない場合は上の<img>を消して
+          下のコメントを外してください：
+
+        <div class="item-placeholder">
+          <span class="ph-icon">🎨</span>
+          <span class="ph-label">ILLUST · 01</span>
+        </div>
+        -->
+      </div>
+      <div class="caption">このシーン好きすぎて描いた</div>
+    </div>
+
+    <div class="item">
+      <div class="item-img">
+        <img src="img2.jpg" alt="表情が良すぎる">
+      </div>
+      <div class="caption">表情が良すぎる</div>
+    </div>
+
+    <div class="item">
+      <div class="item-img">
+        <img src="img3.jpg" alt="なんとなく描いたけど気に入ってる">
+      </div>
+      <div class="caption">なんとなく描いたけど気に入ってる</div>
+    </div>
+
+    <!-- ▲▲▲ ここまでコピーして増やす ▲▲▲ -->
+
+  </div>
+</div>
+
+<footer>
+  <p>⚪ © Pokémon Fan Log — 好きを置いておく場所</p>
+</footer>
+
+</body>
+</html>
