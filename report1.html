@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>タイプ相性とフィールド技 — Pokémon Fan Log</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:    #E63946;
+      --yellow: #FFD166;
+      --blue:   #118AB2;
+      --dark:   #1a1a2e;
+      --cream:  #FFF8F0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background-color: var(--cream);
+      color: var(--dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    /* HEADER */
+    header {
+      position: relative; background: var(--red); overflow: hidden;
+    }
+    header::after {
+      content: "";
+      position: absolute; right: -80px; top: 50%; transform: translateY(-50%);
+      width: 220px; height: 220px; border-radius: 50%;
+      background: conic-gradient(#f0f0f0 0deg 180deg, #222 180deg 360deg);
+      opacity: 0.12; border: 12px solid rgba(255,255,255,0.15);
+    }
+    .header-inner {
+      max-width: 1000px; margin: auto;
+      padding: 28px 20px 18px; position: relative; z-index: 2;
+    }
+    header h1 {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: 38px; letter-spacing: 3px;
+      color: #fff; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); line-height: 1;
+    }
+    header h1 span { color: var(--yellow); }
+
+    nav { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+    nav a {
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      padding: 5px 14px;
+      border: 1.5px solid rgba(255,255,255,0.3); border-radius: 999px;
+      transition: all 0.2s;
+    }
+    nav a:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.7); }
+
+    .redline {
+      height: 5px;
+      background: linear-gradient(90deg, var(--red), var(--yellow), var(--blue));
+    }
+
+    /* CONTAINER */
+    .container {
+      max-width: 1000px; margin: auto;
+      padding: 40px 20px 64px;
+      position: relative; z-index: 1;
+    }
+
+    /* SECTION HEADER */
+    .section-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    }
+    .section-header h2 {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: 18px; letter-spacing: 1px; white-space: nowrap;
+    }
+    .section-line {
+      flex: 1; height: 2px;
+      background: linear-gradient(to right, #e0e0e0, transparent);
+      border-radius: 999px;
+    }
+
+    /* LEGEND */
+    .legend {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 700;
+    }
+    .mark { font-size: 16px; }
+    .mark-super  { color: var(--red); }
+    .mark-half   { color: var(--blue); }
+    .mark-none   { color: #aaa; }
+    .mark-normal { color: #ccc; font-size: 12px; }
+
+    /* TYPE COLORS */
+    .t { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .t-normal   { background: #A8A878; color: #fff; }
+    .t-fire     { background: #F08030; color: #fff; }
+    .t-water    { background: #6890F0; color: #fff; }
+    .t-grass    { background: #78C850; color: #fff; }
+    .t-electric { background: #F8D030; color: #333; }
+    .t-ice      { background: #98D8D8; color: #333; }
+    .t-fighting { background: #C03028; color: #fff; }
+    .t-poison   { background: #A040A0; color: #fff; }
+    .t-ground   { background: #E0C068; color: #333; }
+    .t-flying   { background: #A890F0; color: #fff; }
+    .t-psychic  { background: #F85888; color: #fff; }
+    .t-bug      { background: #A8B820; color: #fff; }
+    .t-rock     { background: #B8A038; color: #fff; }
+    .t-ghost    { background: #705898; color: #fff; }
+    .t-dragon   { background: #7038F8; color: #fff; }
+    .t-dark     { background: #705848; color: #fff; }
+    .t-steel    { background: #B8B8D0; color: #333; }
+    .t-fairy    { background: #EE99AC; color: #fff; }
+
+    /* TABLE WRAP */
+    .table-scroll {
+      overflow-x: auto;
+      background: #fff;
+      border: 2px solid #eee;
+      border-radius: 14px;
+      box-shadow: 4px 4px 0 #e0e0e0;
+      margin-bottom: 56px;
+    }
+
+    /* TYPE TABLE */
+    .type-table {
+      border-collapse: collapse;
+      font-size: 11px;
+      min-width: 700px;
+    }
+
+    .type-table th, .type-table td {
+      width: 36px; height: 32px;
+      text-align: center; vertical-align: middle;
+      border: 1px solid #f0f0f0;
+      padding: 0;
+    }
+
+    /* 角ラベル */
+    .corner-cell {
+      width: 80px; min-width: 80px;
+      font-size: 9px; color: #aaa; text-align: center;
+      background: #fafafa;
+      padding: 4px;
+      line-height: 1.4;
+    }
+
+    /* 行ヘッダー（攻撃側） */
+    .row-head {
+      min-width: 80px; width: 80px;
+      padding: 2px 6px;
+      background: #fafafa;
+      text-align: right;
+    }
+
+    /* 列ヘッダー（防御側） */
+    .col-head {
+      height: 80px; width: 36px;
+      background: #fafafa;
+      padding: 4px 2px;
+    }
+    .col-head-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      gap: 3px;
+    }
+    .col-head-label {
+      writing-mode: vertical-rl;
+      font-size: 10px; font-weight: 700;
+      color: var(--dark);
+      letter-spacing: 1px;
+    }
+
+    /* セルのシンボル */
+    .cell-super  { background: #fff0f0; color: var(--red);  font-size: 15px; font-weight: 700; }
+    .cell-half   { background: #f0f5ff; color: var(--blue); font-size: 13px; }
+    .cell-none   { background: #f5f5f5; color: #ccc;        font-size: 13px; }
+    .cell-normal { background: #fff;    color: #eee;        font-size: 10px; }
+
+    /* ── FIELD SECTION ── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .field-card {
+      background: #fff;
+      border: 2px solid #eee;
+      border-radius: 16px;
+      box-shadow: 3px 3px 0 #e0e0e0;
+      overflow: hidden;
+      transition: all 0.18s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .field-card:hover {
+      border-color: var(--red);
+      box-shadow: 5px 5px 0 var(--red);
+      transform: translate(-2px, -2px);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .field-card:nth-child(1) { animation-delay: 0.05s; }
+    .field-card:nth-child(2) { animation-delay: 0.10s; }
+    .field-card:nth-child(3) { animation-delay: 0.15s; }
+    .field-card:nth-child(4) { animation-delay: 0.20s; }
+
+    .field-card-head {
+      padding: 14px 18px 12px;
+      border-bottom: 2px solid #f0f0f0;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .field-icon { font-size: 28px; }
+    .field-name {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: 15px; letter-spacing: 1px;
+    }
+    .field-card-body { padding: 14px 18px 18px; }
+
+    .field-row {
+      display: flex; gap: 8px; align-items: baseline;
+      margin-bottom: 8px; font-size: 13px; line-height: 1.6;
+    }
+    .field-row:last-child { margin-bottom: 0; }
+    .field-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;
+    }
+    .fl-turns   { background: #FFF8E1; color: #B8860B; }
+    .fl-boost   { background: #E8F4FD; color: var(--blue); }
+    .fl-weak    { background: #FEE8E8; color: var(--red); }
+    .fl-other   { background: #F0F0F0; color: #666; }
+    .field-val  { color: #444; }
+
+    /* FOOTER */
+    footer {
+      text-align: center; padding: 30px 20px;
+      border-top: 2px solid #eee;
+      font-size: 12px; color: #aaa;
+      position: relative; z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1><span>Pokémon</span> Fan Log</h1>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="blog.html">BLOG</a>
+      <a href="gallery.html">GALLERY</a>
+      <a href="about.html">ABOUT</a>
+    </nav>
+  </div>
+</header>
+<div class="redline"></div>
+
+<div class="container">
+
+  <!-- ── タイプ相性表 ── -->
+  <div class="section-header">
+    <h2>タイプ相性表</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="mark mark-super">●</span> 効果ばつぐん（×2）</div>
+    <div class="legend-item"><span class="mark mark-half">▲</span> 効果いまひとつ（×0.5）</div>
+    <div class="legend-item"><span class="mark mark-none">✕</span> 効果なし（×0）</div>
+    <div class="legend-item" style="color:#bbb; font-size:12px;">横軸＝攻撃側タイプ　縦軸＝防御側タイプ</div>
+  </div>
+
+  <div class="table-scroll">
+    <table class="type-table" id="typeTable">
+      <!-- JSで描画 -->
+    </table>
+  </div>
+
+  <!-- ── フィールド技 ── -->
+  <div class="section-header">
+    <h2>フィールド技</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="field-grid">
+
+    <div class="field-card">
+      <div class="field-card-head">
+        <span class="field-icon">🌿</span>
+        <span class="field-name t t-grass">グラスフィールド</span>
+      </div>
+      <div class="field-card-body">
+        <div class="field-row">
+          <span class="field-label fl-turns">持続</span>
+          <span class="field-val">5ターン</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-boost">強化</span>
+          <span class="field-val">くさタイプのわざの威力が×1.3。地面にいるポケモンのHPが毎ターン1/16回復</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-weak">弱体</span>
+          <span class="field-val">じしん・じならし・マグニチュードの威力が半減</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-other">発動</span>
+          <span class="field-val">グラスフィールド・ウッドホーン（ラウドボーン）等</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-card-head">
+        <span class="field-icon">⚡</span>
+        <span class="field-name t t-electric">エレキフィールド</span>
+      </div>
+      <div class="field-card-body">
+        <div class="field-row">
+          <span class="field-label fl-turns">持続</span>
+          <span class="field-val">5ターン</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-boost">強化</span>
+          <span class="field-val">でんきタイプのわざの威力が×1.3</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-weak">弱体</span>
+          <span class="field-val">地面にいるポケモンはねむり状態にならない</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-other">発動</span>
+          <span class="field-val">エレキフィールド・サージャスパワー（カミッチュ）等</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-card-head">
+        <span class="field-icon">🌀</span>
+        <span class="field-name t t-psychic">サイコフィールド</span>
+      </div>
+      <div class="field-card-body">
+        <div class="field-row">
+          <span class="field-label fl-turns">持続</span>
+          <span class="field-val">5ターン</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-boost">強化</span>
+          <span class="field-val">エスパータイプのわざの威力が×1.3</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-weak">弱体</span>
+          <span class="field-val">地面にいるポケモンは優先度+1以上のわざを受けない</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-other">発動</span>
+          <span class="field-val">サイコフィールド・フュージョンボルト（ケルディオ）等</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-card-head">
+        <span class="field-icon">🌫️</span>
+        <span class="field-name t t-fairy">ミストフィールド</span>
+      </div>
+      <div class="field-card-body">
+        <div class="field-row">
+          <span class="field-label fl-turns">持続</span>
+          <span class="field-val">5ターン</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-boost">強化</span>
+          <span class="field-val">フェアリータイプのわざの威力が×1.3</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-weak">弱体</span>
+          <span class="field-val">地面にいるポケモンは状態異常にならない。ドラゴンタイプのわざの威力が半減</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label fl-other">発動</span>
+          <span class="field-val">ミストフィールド・ムーンフォース（ニンフィア）等</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  <p>⚪ © Pokémon Fan Log — 好きを置いておく場所</p>
+</footer>
+
+<script>
+/* ============================================================
+   タイプ一覧（攻撃側 = 行、防御側 = 列）
+============================================================ */
+const TYPES = [
+  { name: "ノーマル",  cls: "t-normal"   },
+  { name: "ほのお",   cls: "t-fire"     },
+  { name: "みず",     cls: "t-water"    },
+  { name: "くさ",     cls: "t-grass"    },
+  { name: "でんき",   cls: "t-electric" },
+  { name: "こおり",   cls: "t-ice"      },
+  { name: "かくとう", cls: "t-fighting" },
+  { name: "どく",     cls: "t-poison"   },
+  { name: "じめん",   cls: "t-ground"   },
+  { name: "ひこう",   cls: "t-flying"   },
+  { name: "エスパー", cls: "t-psychic"  },
+  { name: "むし",     cls: "t-bug"      },
+  { name: "いわ",     cls: "t-rock"     },
+  { name: "ゴースト", cls: "t-ghost"    },
+  { name: "ドラゴン", cls: "t-dragon"   },
+  { name: "あく",     cls: "t-dark"     },
+  { name: "はがね",   cls: "t-steel"    },
+  { name: "フェアリー",cls:"t-fairy"    },
+];
+
+/*
+  chart[攻撃側][防御側] の値
+  2 = ばつぐん(●)  0.5 = いまひとつ(▲)  0 = なし(✕)  1 = 通常
+*/
+const chart = {
+  "ノーマル":  { "いわ":0.5,"はがね":0.5,"ゴースト":0 },
+  "ほのお":    { "ほのお":0.5,"みず":0.5,"くさ":2,"こおり":2,"むし":2,"いわ":0.5,"ドラゴン":0.5,"はがね":2 },
+  "みず":      { "ほのお":2,"みず":0.5,"くさ":0.5,"じめん":2,"いわ":2,"ドラゴン":0.5 },
+  "くさ":      { "ほのお":0.5,"みず":2,"くさ":0.5,"どく":0.5,"じめん":2,"ひこう":0.5,"むし":0.5,"いわ":2,"ドラゴン":0.5,"はがね":0.5 },
+  "でんき":    { "みず":2,"でんき":0.5,"くさ":0.5,"じめん":0,"ひこう":2,"ドラゴン":0.5 },
+  "こおり":    { "ほのお":0.5,"みず":0.5,"くさ":2,"こおり":0.5,"じめん":2,"ひこう":2,"ドラゴン":2,"はがね":0.5 },
+  "かくとう":  { "ノーマル":2,"こおり":2,"どく":0.5,"いわ":2,"ゴースト":0,"エスパー":0.5,"むし":0.5,"ひこう":0.5,"あく":2,"はがね":2,"フェアリー":0.5 },
+  "どく":      { "くさ":2,"どく":0.5,"じめん":0.5,"いわ":0.5,"ゴースト":0.5,"はがね":0,"フェアリー":2 },
+  "じめん":    { "ほのお":2,"でんき":2,"くさ":0.5,"どく":2,"ひこう":0,"いわ":2,"はがね":2 },
+  "ひこう":    { "でんき":0.5,"くさ":2,"かくとう":2,"むし":2,"いわ":0.5,"はがね":0.5 },
+  "エスパー":  { "かくとう":2,"どく":2,"エスパー":0.5,"あく":0,"はがね":0.5 },
+  "むし":      { "ほのお":0.5,"くさ":2,"かくとう":0.5,"どく":0.5,"ひこう":0.5,"エスパー":2,"ゴースト":0.5,"あく":2,"はがね":0.5,"フェアリー":0.5 },
+  "いわ":      { "ほのお":2,"こおり":2,"かくとう":0.5,"じめん":0.5,"ひこう":2,"むし":2,"はがね":0.5 },
+  "ゴースト":  { "ノーマル":0,"エスパー":2,"ゴースト":2,"あく":0.5 },
+  "ドラゴン":  { "ドラゴン":2,"はがね":0.5,"フェアリー":0 },
+  "あく":      { "かくとう":0.5,"エスパー":2,"ゴースト":2,"あく":0.5,"フェアリー":0.5 },
+  "はがね":    { "ほのお":0.5,"みず":0.5,"でんき":0.5,"こおり":2,"いわ":2,"はがね":0.5,"フェアリー":2 },
+  "フェアリー":{ "ほのお":0.5,"かくとう":2,"どく":0.5,"ドラゴン":2,"あく":2,"はがね":0.5 },
+};
+
+function getVal(atk, def) {
+  return (chart[atk] && chart[atk][def] !== undefined) ? chart[atk][def] : 1;
+}
+
+/* テーブル描画 */
+const table = document.getElementById('typeTable');
+
+// ヘッダー行（防御側タイプ）
+const thead = document.createElement('thead');
+const headRow = document.createElement('tr');
+
+const corner = document.createElement('th');
+corner.className = 'corner-cell';
+corner.innerHTML = '攻撃→<br>↓防御';
+headRow.appendChild(corner);
+
+TYPES.forEach(def => {
+  const th = document.createElement('th');
+  th.className = 'col-head';
+  th.innerHTML = `<div class="col-head-inner"><span class="col-head-label">${def.name}</span></div>`;
+  headRow.appendChild(th);
+});
+thead.appendChild(headRow);
+table.appendChild(thead);
+
+// ボディ（攻撃側タイプ × 防御側タイプ）
+const tbody = document.createElement('tbody');
+TYPES.forEach(atk => {
+  const tr = document.createElement('tr');
+
+  // 行ヘッダー（攻撃タイプ）
+  const rowHead = document.createElement('td');
+  rowHead.className = 'row-head';
+  rowHead.innerHTML = `<span class="t ${atk.cls}">${atk.name}</span>`;
+  tr.appendChild(rowHead);
+
+  TYPES.forEach(def => {
+    const td = document.createElement('td');
+    const val = getVal(atk.name, def.name);
+    if      (val === 2)   { td.className = 'cell-super';  td.textContent = '●'; }
+    else if (val === 0.5) { td.className = 'cell-half';   td.textContent = '▲'; }
+    else if (val === 0)   { td.className = 'cell-none';   td.textContent = '✕'; }
+    else                  { td.className = 'cell-normal'; td.textContent = '－'; }
+    tr.appendChild(td);
+  });
+
+  tbody.appendChild(tr);
+});
+table.appendChild(tbody);
+</script>
+
+</body>
+</html>
